@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 public class Analizer {
     private String codigo;
+    // private String codigoSinComentarios;
     private final Token numero;
     private final Token palabraReservada;
     private final Token operador;
@@ -22,6 +23,8 @@ public class Analizer {
     private final Token identificador;
     private final Token blanksOrUnknown;
     private final ArrayList<String> reservedWords;
+    
+    private final ArrayList<String> lineasSinComentarios;
     
     /**
      * Inicializa atributos Token
@@ -46,6 +49,8 @@ public class Analizer {
                 "super","switch","synchronized","this","throw","throws",
                 "transient","true","try","void","volatile","while"
         ));
+        
+        lineasSinComentarios = new ArrayList<>();
     }
     
     /**
@@ -76,40 +81,82 @@ public class Analizer {
         return texto;
     }
     
+    private void quitarComments() {
+        List<String> lineas = codigo.lines().toList();
+	StringBuilder linTemp;
+        
+        int posI, posF;
+        
+        for (var i = 0; i < lineas.size(); ++i) {
+	    
+	    linTemp = new StringBuilder();
+
+            if (lineas.get(i).contains("//")) {
+                posI = lineas.get(i).indexOf("//");
+                lineasSinComentarios.add(lineas.get(i).substring(0, posI));
+            } else if (lineas.get(i).contains("/*")) {
+                posI = lineas.get(i).indexOf("/*");
+		linTemp.append(lineas.get(i).substring(0, posI));
+
+		if (lineas.get(i).contains("*/")) {
+			posF = lineas.get(i).indexOf("*/");
+			linTemp.append(lineas.get(i).substring(posF, lineas.get(i).lenght()-1));
+			lineasSinComentarios.add(linTemp.toString());
+			continue;
+		}
+            } else if (lineas.get(i).contains("*/")) {
+                    posF = lineas.get(i).indexOf("*/");
+		    linTemp.append("\n").append(lineas.get(i).substring(posF, lineas.get(i).length()-1));
+                    lineasSinComentarios.add(linTemp.toString());
+            } else {
+                lineasSinComentarios.add(lineas.get(i));
+            }
+        }
+        
+        
+    }
+    
     /**
      * Analiza el codigo fuente y lo esquematiza por tokens
      */
-    public void tokenLexe() {        
-        List<String> lines = codigo.lines().toList();
-        System.out.println(lines.size()); // Numero de lienas de codigo
+    public void tokenLexe() {
+        quitarComments();
+        System.out.println(lineasSinComentarios.size()); // Numero de lienas de codigo
         
         String num = "(\\d+)|(\\d+\".\"\\d+)";
-        String operators = "([+-/%==<><=>=\\[]||&&!!=.\\*]+)";
+        String operators = "([\\*+-/%==<><=>=\\[]||&&!!=.]+)";
         String groupers = "([{}()]+)";
         String delimeter = "([;,:]+)";
         String blanks = "(\\s*)";
         String specialChar = "([°¬#\\?¡¿'@]+)";
         String identifier = "(([a-zA-Z]+)[$_\\d]*)";
+        // String comment = "([(/\\*\\*)|(\\*/)|(//)]+)";
         
         ArrayList<Pattern> patterns = new ArrayList(Arrays.asList(
                 Pattern.compile(num),           // 0
                 Pattern.compile(operators),     // 1
                 Pattern.compile(groupers),      // 2
                 Pattern.compile(delimeter),     // 3
-                Pattern.compile(blanks),        // 4 Comments, WhiteLines
+                Pattern.compile(blanks),        // 4 WhiteLines
                 Pattern.compile(specialChar),   // 5
-                Pattern.compile(identifier)     // 6
+                Pattern.compile(identifier)    // 6
+                // Pattern.compile(comment)        // 7 Comments
                 
         ));
         
         topper:
         for (var pat = 0; pat < patterns.size(); ++pat) { // Tipo de TOKEN
             
-            for (var row = 0; row < lines.size(); ++row) { // FILA de codigo a revisar
-                Matcher mat = patterns.get(pat).matcher(lines.get(row));
+            for (var row = 0; row < lineasSinComentarios.size(); ++row) { // FILA de codigo a revisar
+                Matcher mat = patterns.get(pat).matcher(lineasSinComentarios.get(row));
                 
                 while (!mat.hitEnd()) { // POSICIONES disponibles aun de la linea a revisar
                     switch (pat) {
+                        /**case -1 -> {
+                            if (mat.find()) {
+                                // if (mat.group().equals("//"))
+                            }
+                        }*/
                         case 0 -> {
                             if (mat.find()) {
                                 numero.addLexema(mat.group());

@@ -36,7 +36,9 @@ public class InicioController {
         
         fileChooser.getExtensionFilters().addAll(
                 new FileChooser.ExtensionFilter("Archivos de texto", "*.txt"),
-                new FileChooser.ExtensionFilter("Archivos Java", "*.java"));
+                new FileChooser.ExtensionFilter("Archivos Java", "*.java"),
+                new FileChooser.ExtensionFilter("Archivos C++", "*.cpp")
+        );
         
         archivo = fileChooser.showOpenDialog(cargar.getScene().getWindow());
         
