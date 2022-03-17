@@ -26,18 +26,17 @@ public class TablaLexController {
     private void tablaOnPressed() {
         App.analizer.tokenLexe(); // HACE EL ANALISIS LEXICO ---- AAAAAAAAAA! QUE FEOOOOOOO!
         Token t1 = App.analizer.getAgrupador();
-        Token t2 = App.analizer.getBlanksOrUnknown();
-        Token t3 = App.analizer.getDelimitador();
-        Token t4 = App.analizer.getIdentificador();
-        Token t5 = App.analizer.getOperador();
-        Token t6 = App.analizer.getPalabraReservada();
-        Token t7 = App.analizer.getSimbolo();
-        List<Token> l = new ArrayList<>(Arrays.asList(t1,t2,t3,t4,t5,t6,t7));
+        Token t2 = App.analizer.getDelimitador();
+        Token t3 = App.analizer.getIdentificador();
+        Token t4 = App.analizer.getOperador();
+        Token t5 = App.analizer.getPalabraReservada();
+        Token t6 = App.analizer.getSimbolo();
+        List<Token> l = new ArrayList<>(Arrays.asList(t1,t2,t3,t4,t5,t6));
         
         System.out.println("CREANDO TABLA");
         HashMap<String, Integer> hm;
         int rows = 0;
-        for (var x = 0; x < 7; ++x) {
+        for (var x = 0; x < 6; ++x) {
             hm = l.get(x).getLexemas(); // Obtiene el HashMap con los LEXEMAS de un tipo de TOKEN
             
             for (var p : hm.keySet()) {

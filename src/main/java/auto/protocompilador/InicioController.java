@@ -1,9 +1,7 @@
 package auto.protocompilador;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -15,7 +13,6 @@ import javafx.stage.Stage;
 public class InicioController {
     private FileChooser fileChooser;
     private File archivo;
-    // private StringBuilder texto;
     
     @FXML
     private Button cargar;
@@ -42,20 +39,6 @@ public class InicioController {
         
         archivo = fileChooser.showOpenDialog(cargar.getScene().getWindow());
         
-        /*if (archivo != null) {
-            FileReader fr = new FileReader(archivo);
-            BufferedReader br = new BufferedReader(fr);
-        
-            String s;
-            while (true) {
-                s = br.readLine();
-                if (!(s != null)) break;
-                texto.append(s).append("\n");
-            }
-            
-            fr.close();
-        }*/
-        
         area.setText(App.analizer.fileCharger(archivo).toString());
     }
     
@@ -73,6 +56,5 @@ public class InicioController {
     @FXML
     void initialize() {
         fileChooser = new FileChooser();
-        // texto = new StringBuilder();
     }
 }

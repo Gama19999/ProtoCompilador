@@ -21,39 +21,39 @@
                <image>
                   <Image url="@../images/blue-background-ge61cbb2f5_1920.jpg" />
                </image></ImageView>
-            <TextArea fx:id="area" editable="false" layoutX="67.0" layoutY="129.0" prefHeight="253.0" prefWidth="547.0">
+            <TextArea fx:id="area" editable="false" layoutX="67.0" layoutY="114.0" prefHeight="295.0" prefWidth="547.0">
                <font>
                   <Font name="Consolas Bold" size="14.0" />
                </font></TextArea>
-            <Button fx:id="cargar" layoutX="31.0" layoutY="78.0" mnemonicParsing="false" onAction="#cargarPressed" prefHeight="0.0" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="CARGAR" textFill="WHITE">
+            <Button fx:id="cargar" layoutX="31.0" layoutY="65.0" mnemonicParsing="false" onAction="#cargarPressed" prefHeight="0.0" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="CARGAR" textFill="WHITE">
                <font>
                   <Font name="Gabriola" size="20.0" />
                </font>
                <padding>
                   <Insets top="-1.0" />
                </padding></Button>
-            <Button fx:id="lexico" layoutX="116.0" layoutY="417.0" mnemonicParsing="false" onAction="#lexicoPressed" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="LÉXICO" textFill="WHITE">
+            <Button fx:id="lexico" layoutX="116.0" layoutY="431.0" mnemonicParsing="false" onAction="#lexicoPressed" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="LÉXICO" textFill="WHITE">
                <font>
                   <Font name="Gabriola" size="20.0" />
                </font>
                <padding>
                   <Insets top="-1.0" />
                </padding></Button>
-            <Button fx:id="sintactico" layoutX="275.0" layoutY="417.0" mnemonicParsing="false" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="SINTÁCTICO" textFill="WHITE">
+            <Button fx:id="sintactico" layoutX="275.0" layoutY="431.0" mnemonicParsing="false" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="SINTÁCTICO" textFill="WHITE">
                <font>
                   <Font name="Gabriola" size="20.0" />
                </font>
                <padding>
                   <Insets top="-1.0" />
                </padding></Button>
-            <Button fx:id="semantico" layoutX="434.0" layoutY="417.0" mnemonicParsing="false" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="SEMÁNTICO" textFill="WHITE">
+            <Button fx:id="semantico" layoutX="434.0" layoutY="431.0" mnemonicParsing="false" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="SEMÁNTICO" textFill="WHITE">
                <font>
                   <Font name="Gabriola" size="20.0" />
                </font>
                <padding>
                   <Insets top="-1.0" />
                </padding></Button>
-            <Label layoutX="96.0" layoutY="29.0" text="COMPILADOR PROTOTIPO DELTA 1.0" textFill="WHITE">
+            <Label layoutX="96.0" layoutY="22.0" text="COMPILADOR PROTOTIPO DELTA 1.0" textFill="WHITE">
                <font>
                   <Font name="Tourner Regular" size="25.0" />
                </font></Label>

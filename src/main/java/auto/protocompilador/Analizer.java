@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 
 public class Analizer {
     private String codigo;
-    // private String codigoSinComentarios;
     private final Token numero;
     private final Token palabraReservada;
     private final Token operador;
@@ -98,22 +97,19 @@ public class Analizer {
                 posI = lineas.get(i).indexOf("/*");
 		linTemp.append(lineas.get(i).substring(0, posI));
 
-		if (lineas.get(i).contains("*/")) {
-			posF = lineas.get(i).indexOf("*/");
-			linTemp.append(lineas.get(i).substring(posF, lineas.get(i).lenght()-1));
-			lineasSinComentarios.add(linTemp.toString());
-			continue;
-		}
+                while (!lineas.get(i).contains("*/")) ++i;
+                
+                posF = lineas.get(i).indexOf("*/");
+                linTemp.append(lineas.get(i).substring(posF+2, lineas.get(i).length()));
+		lineasSinComentarios.add(linTemp.toString());
             } else if (lineas.get(i).contains("*/")) {
                     posF = lineas.get(i).indexOf("*/");
-		    linTemp.append("\n").append(lineas.get(i).substring(posF, lineas.get(i).length()-1));
+		    linTemp.append("\n").append(lineas.get(i).substring(posF+2, lineas.get(i).length()));
                     lineasSinComentarios.add(linTemp.toString());
             } else {
                 lineasSinComentarios.add(lineas.get(i));
             }
-        }
-        
-        
+        }  
     }
     
     /**
@@ -130,7 +126,6 @@ public class Analizer {
         String blanks = "(\\s*)";
         String specialChar = "([°¬#\\?¡¿'@]+)";
         String identifier = "(([a-zA-Z]+)[$_\\d]*)";
-        // String comment = "([(/\\*\\*)|(\\*/)|(//)]+)";
         
         ArrayList<Pattern> patterns = new ArrayList(Arrays.asList(
                 Pattern.compile(num),           // 0
@@ -139,12 +134,10 @@ public class Analizer {
                 Pattern.compile(delimeter),     // 3
                 Pattern.compile(blanks),        // 4 WhiteLines
                 Pattern.compile(specialChar),   // 5
-                Pattern.compile(identifier)    // 6
-                // Pattern.compile(comment)        // 7 Comments
+                Pattern.compile(identifier)     // 6
                 
         ));
         
-        topper:
         for (var pat = 0; pat < patterns.size(); ++pat) { // Tipo de TOKEN
             
             for (var row = 0; row < lineasSinComentarios.size(); ++row) { // FILA de codigo a revisar
@@ -152,56 +145,43 @@ public class Analizer {
                 
                 while (!mat.hitEnd()) { // POSICIONES disponibles aun de la linea a revisar
                     switch (pat) {
-                        /**case -1 -> {
-                            if (mat.find()) {
-                                // if (mat.group().equals("//"))
-                            }
-                        }*/
                         case 0 -> {
                             if (mat.find()) {
                                 numero.addLexema(mat.group());
-                                System.out.println("Numero: " + mat.group());
                             } break;
                         }
                         case 1 -> {
                             if (mat.find()) {
                                 operador.addLexema(mat.group());
-                                System.out.println("Operador: " + mat.group());
                             } break;
                         }
                         case 2 -> {
                             if (mat.find()) {
                                 agrupador.addLexema(mat.group());
-                                System.out.println("Agrupador: " + mat.group());
                             } break;
                         }
                         case 3 -> {
                             if (mat.find()) {
                                 delimitador.addLexema(mat.group());
-                                System.out.println("Delimitador: " + mat.group());
                             } break;
                         }
                         case 4 -> {
                             if (mat.find()) {
                                 blanksOrUnknown.addLexema(mat.group());
-                                System.out.println("Blanks Or Unknown: " + mat.group());
                             } break;
                         }
                         case 5 -> {
                             if (mat.find()) {
                                 simbolo.addLexema(mat.group());
-                                System.out.println("Simbolo: " + mat.group());
                             } break;
                         }
                         case 6 -> {
                             if (mat.find()) {
                                 if (reservedWords.contains(mat.group())) {
                                     palabraReservada.addLexema(mat.group(0));
-                                    System.out.println("P Reservada: " + mat.group(0));
                                     break;
                                 } else {
                                     identificador.addLexema(mat.group(0));
-                                    System.out.println("Identificador: " + mat.group(0));
                                     break;
                                 }
                             } break;
