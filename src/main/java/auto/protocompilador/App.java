@@ -20,6 +20,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("inicio"), 700, 500);
+
         stage.getIcons().add(new Image("https://cdn-icons-png.flaticon.com/512/1179/1179782.png"));
         stage.setTitle("Compilador Prototipo");
         stage.setResizable(false);

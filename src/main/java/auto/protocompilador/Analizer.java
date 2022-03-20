@@ -69,7 +69,7 @@ public class Analizer {
             String s;
             while (true) {
                 s = br.readLine();
-                if (!(s != null)) break;
+                if (s == null) break;
                 texto.append(s).append("\n");
             }
             
@@ -88,24 +88,24 @@ public class Analizer {
         
         for (var i = 0; i < lineas.size(); ++i) {
 	    
-	    linTemp = new StringBuilder();
+	        linTemp = new StringBuilder();
 
             if (lineas.get(i).contains("//")) {
                 posI = lineas.get(i).indexOf("//");
                 lineasSinComentarios.add(lineas.get(i).substring(0, posI));
             } else if (lineas.get(i).contains("/*")) {
                 posI = lineas.get(i).indexOf("/*");
-		linTemp.append(lineas.get(i).substring(0, posI));
+		        linTemp.append(lineas.get(i).substring(0, posI));
 
                 while (!lineas.get(i).contains("*/")) ++i;
                 
                 posF = lineas.get(i).indexOf("*/");
                 linTemp.append(lineas.get(i).substring(posF+2, lineas.get(i).length()));
-		lineasSinComentarios.add(linTemp.toString());
+		        lineasSinComentarios.add(linTemp.toString());
             } else if (lineas.get(i).contains("*/")) {
-                    posF = lineas.get(i).indexOf("*/");
-		    linTemp.append("\n").append(lineas.get(i).substring(posF+2, lineas.get(i).length()));
-                    lineasSinComentarios.add(linTemp.toString());
+                posF = lineas.get(i).indexOf("*/");
+		        linTemp.append("\n").append(lineas.get(i).substring(posF+2, lineas.get(i).length()));
+                lineasSinComentarios.add(linTemp.toString());
             } else {
                 lineasSinComentarios.add(lineas.get(i));
             }
@@ -127,7 +127,7 @@ public class Analizer {
         String specialChar = "([°¬#\\?¡¿'@]+)";
         String identifier = "(([a-zA-Z]+)[$_\\d]*)";
         
-        ArrayList<Pattern> patterns = new ArrayList(Arrays.asList(
+        ArrayList<Pattern> patterns = new ArrayList<>(Arrays.asList(
                 Pattern.compile(num),           // 0
                 Pattern.compile(operators),     // 1
                 Pattern.compile(groupers),      // 2
@@ -148,43 +148,41 @@ public class Analizer {
                         case 0 -> {
                             if (mat.find()) {
                                 numero.addLexema(mat.group());
-                            } break;
+                            }
                         }
                         case 1 -> {
                             if (mat.find()) {
                                 operador.addLexema(mat.group());
-                            } break;
+                            }
                         }
                         case 2 -> {
                             if (mat.find()) {
                                 agrupador.addLexema(mat.group());
-                            } break;
+                            }
                         }
                         case 3 -> {
                             if (mat.find()) {
                                 delimitador.addLexema(mat.group());
-                            } break;
+                            }
                         }
                         case 4 -> {
                             if (mat.find()) {
                                 blanksOrUnknown.addLexema(mat.group());
-                            } break;
+                            }
                         }
                         case 5 -> {
                             if (mat.find()) {
                                 simbolo.addLexema(mat.group());
-                            } break;
+                            }
                         }
                         case 6 -> {
                             if (mat.find()) {
                                 if (reservedWords.contains(mat.group())) {
                                     palabraReservada.addLexema(mat.group(0));
-                                    break;
                                 } else {
                                     identificador.addLexema(mat.group(0));
-                                    break;
                                 }
-                            } break;
+                            }
                         }
                     }
                 }

@@ -35,13 +35,12 @@ public class TablaLexController {
         
         System.out.println("CREANDO TABLA");
         HashMap<String, Integer> hm;
-        int rows = 0;
+
         for (var x = 0; x < 6; ++x) {
             hm = l.get(x).getLexemas(); // Obtiene el HashMap con los LEXEMAS de un tipo de TOKEN
             
             for (var p : hm.keySet()) {
                 data.add(FXCollections.observableArrayList()); // Agrega una tupla
-                rows += hm.size();
                 
                 int index = data.size() - 1;
                 data.get(index).add(p);                     // Agrega el LEXEMA

@@ -21,6 +21,6 @@ public class Token {
     
     public void addLexema(String lexema) {
         if(lexemas.containsKey(lexema)) lexemas.replace(lexema, (lexemas.get(lexema)+1));
-	else lexemas.put(lexema, 1);
+	    else lexemas.put(lexema, 1);
     }
 }

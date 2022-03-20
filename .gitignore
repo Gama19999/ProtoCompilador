@@ -1,3 +1,4 @@
 # Unnecesary Folders
 /target
-/src/test
+/.idea
+*.iml

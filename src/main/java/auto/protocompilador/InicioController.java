@@ -7,13 +7,13 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class InicioController {
     private FileChooser fileChooser;
-    private File archivo;
-    
+
     @FXML
     private Button cargar;
     @FXML
@@ -27,7 +27,7 @@ public class InicioController {
     private TextArea area;
     
     @FXML
-    private void cargarPressed() throws FileNotFoundException, IOException {
+    private void cargarPressed() throws IOException {
         
         fileChooser.setTitle("Buscar archivo de codigo fuente");
         
@@ -36,8 +36,8 @@ public class InicioController {
                 new FileChooser.ExtensionFilter("Archivos Java", "*.java"),
                 new FileChooser.ExtensionFilter("Archivos C++", "*.cpp")
         );
-        
-        archivo = fileChooser.showOpenDialog(cargar.getScene().getWindow());
+
+        File archivo = fileChooser.showOpenDialog(cargar.getScene().getWindow());
         
         area.setText(App.analizer.fileCharger(archivo).toString());
     }
@@ -46,7 +46,8 @@ public class InicioController {
     private void lexicoPressed() throws IOException {
         Stage stage = new Stage();
         Scene scene = new Scene(App.loadFXML("tablaLex"), 590, 600);
-        
+
+        stage.getIcons().add(new Image("https://cdn-icons-png.flaticon.com/512/1179/1179782.png"));
         stage.setTitle("Analizador Lexico");
         stage.setResizable(false);
         stage.setScene(scene);
