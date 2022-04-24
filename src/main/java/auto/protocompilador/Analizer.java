@@ -1,5 +1,8 @@
 package auto.protocompilador;
 
+import com.google.common.collect.Lists;
+import javafx.util.Pair;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,11 +11,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Analizer {
-    private String codigo;
     private final Token numero;
     private final Token palabraReservada;
     private final Token operador;
@@ -22,8 +25,13 @@ public class Analizer {
     private final Token identificador;
     private final Token blanksOrUnknown;
     private final ArrayList<String> reservedWords;
-    
+
+    // CODIGO
+    private String codigo;
     private final ArrayList<String> lineasSinComentarios;
+
+    // PILA DE AGRUPADORES
+    private final Stack<Character> groupers = new Stack<>();
     
     /**
      * Inicializa atributos Token
@@ -81,8 +89,14 @@ public class Analizer {
     }
     
     private void quitarComments() {
-        List<String> lineas = codigo.lines().toList();
-	StringBuilder linTemp;
+        ArrayList<String> lineas = new ArrayList<>();
+	    StringBuilder linTemp;
+
+        // Quita espacios en blanco
+        List<String> temp = codigo.lines().toList();
+        for (var x : temp) {
+            lineas.add(x.replaceAll("\\s*", ""));
+        }
         
         int posI, posF;
         
@@ -113,7 +127,7 @@ public class Analizer {
     }
     
     /**
-     * Analiza el codigo fuente y lo esquematiza por tokens
+     * Analiza el codigo fuente y lo esquematiza por tokens<p>ANÁLISIS SINTÁCTICO</p>
      */
     public void tokenLexe() {
         quitarComments();
@@ -188,6 +202,86 @@ public class Analizer {
                 }
             }
         }
+    }
+
+    /*public void controlStructuresAnalizer() {
+
+        var llaveAbrir = 0;
+        var llaveCerrar = 0;
+        var parentesisAbrir = 0;
+        var parentesisCerrar = 0;
+
+        for (var pos = 0; pos < codigo.length(); ++pos) {
+            llaveAbrir = codigo.charAt(pos) == '{' ? +1 : +0;
+            llaveCerrar = codigo.charAt(pos) == '}' ? llaveAbrir : +0;
+            llaveAbrir--;
+
+            if (llaveAbrir == 0) {
+                System.out.println("Todo bien");
+            } else {
+                System.out.println("Esta mal");
+            }
+        }
+    }*/
+
+    /**
+     * Verifica que las LLAVES o PARENTESIS sean CORRESPONDIENTES
+     * @param index Caracter en un indice especifico de la linea
+     * @param row Entero que representa la linea de codigo que se lee
+     * @return Cadena o NULL con el posible error
+     */
+    private String indexGrouper(char index, int row) {
+        var error = "Error: '" + index + "' en la línea -> ";
+
+        // Verifica si HAY una LLAVE ó PARENTESIS de ABRIR
+        if (index == '{' || index == '(') {
+            groupers.push(index); // Agrega el caracter a la pila
+        } else if (index == '}' || index == ')') { // Verifica si HAY una LLAVE ó PARENTESIS de CERRAR
+            if (groupers.isEmpty()) { // Verifica la pila vacia que es ERROR
+                return error + row;
+            } else {
+                char topGroupers = groupers.peek(); // Obtiene el agrupador MAS RECIENTE de la pila
+                // Compara que sean CORRESPONDIENTES
+                if ((index == '}' && topGroupers == '{') || (index == ')' && topGroupers == '(')) {
+                    groupers.pop(); // Elimina ese agrupador de la pila
+                } else {
+                    return error + row;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Analiza el codigo fuente y verifica la integridad de las estructuras de control
+     * @return ArrayList de cadenas o NULLs con los posibles errores en el codigo y la linea de estos
+     */
+    public ArrayList<String> controlSTAnalyzer() {
+        // "if","else","for","while","switch","do"
+        ArrayList<String> errors = new ArrayList<>();
+
+        for (var row : lineasSinComentarios) {
+            for (var index : Lists.charactersOf(row)) {
+                errors.add(indexGrouper(index, lineasSinComentarios.indexOf(row)));
+            }
+            // TODO terminar esta parte ----V
+            // Verifica si es una ESTRUCTURA de CONTROL (if, for, while, switch)
+            if (row.contains("if")) {
+                if (!(row.charAt(row.indexOf("if")+2) == '(')) errors.add("Error: '(' en la línea -> " + lineasSinComentarios.indexOf(row));
+            } else if (row.contains("for")) {
+
+            } else if (row.contains("while")) {
+
+            } else if (row.contains("switch")) {
+
+            } else if (row.contains("do")) {
+
+            } else if (row.contains("else")) {
+                // TODO special happening
+            }
+        }
+
+        return errors;
     }
 
     public Token getPalabraReservada() {

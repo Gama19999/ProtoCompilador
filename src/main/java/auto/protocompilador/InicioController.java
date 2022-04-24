@@ -53,6 +53,12 @@ public class InicioController {
         stage.setScene(scene);
         stage.show();
     }
+
+    @FXML
+    private void sintacticoPressed() {
+        // TODO agregar el metodo de control de estructuras
+        // App.analizer.controlStructuresAnalizer();
+    }
     
     @FXML
     void initialize() {

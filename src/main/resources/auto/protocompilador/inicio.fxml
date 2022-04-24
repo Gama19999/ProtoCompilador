@@ -39,7 +39,7 @@
                <padding>
                   <Insets top="-1.0" />
                </padding></Button>
-            <Button fx:id="sintactico" layoutX="275.0" layoutY="431.0" mnemonicParsing="false" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="SINTÁCTICO" textFill="WHITE">
+            <Button fx:id="sintactico" layoutX="275.0" layoutY="431.0" mnemonicParsing="false" onAction="#sintacticoPressed" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="SINTÁCTICO" textFill="WHITE">
                <font>
                   <Font name="Gabriola" size="20.0" />
                </font>
