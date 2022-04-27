@@ -22,7 +22,7 @@
                   <BoxBlur height="8.0" iterations="2" />
                </effect>
             </ImageView>
-            <TableView fx:id="tabla" layoutX="45.0" layoutY="14.0" prefHeight="501.0" prefWidth="480.0" />
+            <TableView fx:id="tabla" layoutX="45.0" layoutY="14.0" prefHeight="501.0" prefWidth="480.0" stylesheets="@../css/tabla.css" />
             <Button fx:id="tablaOn" layoutX="45.0" layoutY="535.0" mnemonicParsing="false" onAction="#tablaOnPressed" prefHeight="31.0" prefWidth="186.0" style="-fx-background-color: none; -fx-border-color: cyan; -fx-border-radius: 15; -fx-border-width: 3;" text="MOSTRAR DATOS" textFill="WHITE">
                 <font>
                   <Font name="Gabriola" size="20.0" />

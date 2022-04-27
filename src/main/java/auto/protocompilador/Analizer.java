@@ -1,20 +1,20 @@
 package auto.protocompilador;
 
 import com.google.common.collect.Lists;
-import javafx.util.Pair;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.io.*;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Clase que realiza la lectura del codigo fuente cargado ademas de realizar:<br>
+ * <br> Analisis Lexico: {tokenLexe}
+ * <br> Analisis Sintactico: {controlStructuresAnalizer}
+ * <br> Analisis Semantico
+ */
 public class Analizer {
     private final Token numero;
     private final Token palabraReservada;
@@ -29,12 +29,13 @@ public class Analizer {
     // CODIGO
     private String codigo;
     private final ArrayList<String> lineasSinComentarios;
+    private final ArrayList<String> codigoEnLineas;
 
     // PILA DE AGRUPADORES
     private final Stack<Character> groupers = new Stack<>();
     
     /**
-     * Inicializa atributos Token
+     * Inicializa atributos Token y clase Analizer
      */
     public Analizer() {
         numero = new Token("NUMERO");
@@ -58,17 +59,27 @@ public class Analizer {
         ));
         
         lineasSinComentarios = new ArrayList<>();
+        codigoEnLineas = new ArrayList<>();
     }
     
     /**
-     * Carga el archivo y lo lee para convertirlo en String
+     * Carga el archivo y lo lee para convertirlo en String ademas de guardarlo para su lectura
      * @param archivo Archivo seleccionado para abrir
-     * @return Un objeto StringBuilder con el codigo fuente
+     * @return Un objeto ObservableList con el codigo fuente por lineas
      * @throws FileNotFoundException Si es que el arquivo no se encontro
      * @throws IOException Excepxion al leer el archivo
      */
-    public StringBuilder fileCharger(File archivo) throws FileNotFoundException, IOException {
+    public ObservableList<ObservableList<String>> fileCharger(File archivo) throws FileNotFoundException, IOException {
+        codigo = null;
+        lineasSinComentarios.clear();
+        codigoEnLineas.clear();
+
         StringBuilder texto = new StringBuilder();
+        ObservableList<ObservableList<String>> lineasCodigo = FXCollections.observableArrayList(); // OBSArrL
+
+        lineasCodigo.add(FXCollections.observableArrayList()); // OBSArrL como FILA Encabezados
+        lineasCodigo.get(0).add("#");
+        lineasCodigo.get(0).add("CÓDIGO FUENTE");
         
         if (archivo != null) {
             FileReader fr = new FileReader(archivo);
@@ -79,24 +90,33 @@ public class Analizer {
                 s = br.readLine();
                 if (s == null) break;
                 texto.append(s).append("\n");
+
+                codigoEnLineas.add(s);
+
+                // Agregando datos
+                lineasCodigo.add(FXCollections.observableArrayList()); // Nueva fila DATOS
+
+                var indice = lineasCodigo.size()-1;
+                lineasCodigo.get(indice).add(String.valueOf(indice)); // Numero de fila
+                lineasCodigo.get(indice).add(s); // Contenido de la fila
             }
             
             fr.close();
         }
         
         codigo = new String(texto);
-        return texto;
+        quitarComments();
+        return lineasCodigo;
     }
-    
-    private void quitarComments() {
-        ArrayList<String> lineas = new ArrayList<>();
-	    StringBuilder linTemp;
 
-        // Quita espacios en blanco
-        List<String> temp = codigo.lines().toList();
-        for (var x : temp) {
-            lineas.add(x.replaceAll("\\s*", ""));
-        }
+    /**
+     * Metodo que analiza el codigo fuente cargado y elimina los comentarios de este<p>
+     * Parte del analisis LEXICO
+     * </p>
+     */
+    private void quitarComments() {
+        List<String> lineas = codigo.lines().toList();
+	    StringBuilder linTemp;
         
         int posI, posF;
         
@@ -123,14 +143,18 @@ public class Analizer {
             } else {
                 lineasSinComentarios.add(lineas.get(i));
             }
-        }  
+        }
+
+        /* Quita espacios en blanco
+        for (var x : lineasSinComentarios) {
+            lineasSinEspaciosComentarios.add(x.replaceAll("\\s*", ""));
+        }*/
     }
     
     /**
      * Analiza el codigo fuente y lo esquematiza por tokens<p>ANÁLISIS SINTÁCTICO</p>
      */
     public void tokenLexe() {
-        quitarComments();
         System.out.println(lineasSinComentarios.size()); // Numero de lienas de codigo
         
         String num = "(\\d+)|(\\d+\".\"\\d+)";
@@ -204,25 +228,121 @@ public class Analizer {
         }
     }
 
-    /*public void controlStructuresAnalizer() {
+    /**
+     * Analiza el codigo fuente y verifica la integridad de las estructuras de control<p>"if","else","for","while","switch","do"</p>
+     * @return ArrayList de cadenas con los posibles errores en el codigo y la linea de estos
+     */
+    public ArrayList<String> controlStructuresAnalizer() {
+        ArrayList<String> control = new ArrayList<>(Arrays.asList("if","for","while","switch"));
+        Stack<String> pila = new Stack<>();
+        ArrayList<String> errores = new ArrayList<>();
 
-        var llaveAbrir = 0;
-        var llaveCerrar = 0;
-        var parentesisAbrir = 0;
-        var parentesisCerrar = 0;
+        var palabra = "";
+        int[] lineaPalabra = {0};
 
-        for (var pos = 0; pos < codigo.length(); ++pos) {
-            llaveAbrir = codigo.charAt(pos) == '{' ? +1 : +0;
-            llaveCerrar = codigo.charAt(pos) == '}' ? llaveAbrir : +0;
-            llaveAbrir--;
-
-            if (llaveAbrir == 0) {
-                System.out.println("Todo bien");
-            } else {
-                System.out.println("Esta mal");
+        outter:
+        for (var fila : lineasSinComentarios) {
+            for (var keyword : control) { // Comprueba una PALABRA DE CONTROL
+                if (palabra.equals("")) {
+                    if (fila.contains(keyword)) {
+                        pila.push(keyword); // La AGREGA a la pila
+                        palabra = keyword;
+                        System.out.println("Push: "+keyword);
+                        codigoEnLineas.forEach(l -> {
+                            if (l.contains(fila)) lineaPalabra[0] = codigoEnLineas.indexOf(l)+1;
+                        });
+                        break;
+                    }
+                } /*else {
+                    var x = controlStructuresAnalizer();
+                    errores.addAll(x);
+                }*/
             }
+
+            switch (palabra) {
+                case "do" -> {
+                    for (var pos = 0; pos < fila.length(); ++pos) {
+                        if (Lists.charactersOf(fila).get(pos) == '{') {
+                            pila.push("{");
+                            System.out.println("Push: {");
+                        } else if (Lists.charactersOf(fila).get(pos) == '}') {
+                            if (pila.peek().equals("{")) {
+                                pila.pop();
+                                System.out.println("Pop: }");
+                                if (fila.contains("} while (")) continue outter;
+                                else {
+                                    errores.add("Error: 'while faltante' en la línea -> " + lineaPalabra[0]);
+                                }
+                            } else {
+                                var error = new StringBuilder();
+                                error.append("Error: '{' en la línea -> ");
+                                codigoEnLineas.forEach(l -> {
+                                    if (l.contains(fila)) error.append(codigoEnLineas.indexOf(l)+1);
+                                });
+                                errores.add(error.toString());
+                            }
+                        }
+                    }
+                }
+                case "else" -> {
+
+                }
+                case "if","for","while","switch" -> {
+                    for (var pos = 0; pos < fila.length(); ++pos) {
+                        if (Lists.charactersOf(fila).get(pos) == '(') {
+                            pila.push("(");
+                            System.out.println("Push: (");
+                        }
+                        else if (Lists.charactersOf(fila).get(pos) == ')') {
+                            if (pila.peek().equals("(")) {
+                                pila.pop();
+                                System.out.println("Pop: )");
+                            } else {
+                                var error = new StringBuilder();
+                                error.append("Error: '(' en la línea -> ");
+                                codigoEnLineas.forEach(l -> {
+                                    if (l.contains(fila)) error.append(codigoEnLineas.indexOf(l)+1);
+                                });
+                                errores.add(error.toString());
+                            }
+                        } else if (Lists.charactersOf(fila).get(pos) == '{') {
+                            pila.push("{");
+                            System.out.println("Push: {");
+                        }
+                        else if (Lists.charactersOf(fila).get(pos) == '}') {
+                            if (pila.peek().equals("{")) {
+                                pila.pop();
+                                System.out.println("Pop: }");
+                            } else {
+                                var error = new StringBuilder();
+                                error.append("Error: '{' en la línea -> ");
+                                codigoEnLineas.forEach(l -> {
+                                    if (l.contains(fila)) error.append(codigoEnLineas.indexOf(l)+1);
+                                });
+                                errores.add(error.toString());
+                            }
+                        }
+                    }
+                }
+                default -> System.out.println("termino un bloque");
+            }
+
+            if (!pila.isEmpty()) {
+                if (pila.peek().equals(palabra)) {
+                    pila.pop();
+                    palabra = "";
+                    System.out.println("Pop: "+palabra);
+                } else if (pila.peek().equals("{")) {
+                    continue outter;
+                } else {
+                    errores.add("Error: '" + pila.peek() + "' en la línea -> " + lineaPalabra[0]);
+                }
+            }
+
         }
-    }*/
+
+        return errores;
+    }
 
     /**
      * Verifica que las LLAVES o PARENTESIS sean CORRESPONDIENTES
@@ -253,32 +373,35 @@ public class Analizer {
     }
 
     /**
-     * Analiza el codigo fuente y verifica la integridad de las estructuras de control
-     * @return ArrayList de cadenas o NULLs con los posibles errores en el codigo y la linea de estos
+     * Analiza el codigo fuente y verifica la integridad de las estructuras de control<p>"if","else","for","while","switch","do"</p>
+     * @return ArrayList de cadenas con los posibles errores en el codigo y la linea de estos
      */
     public ArrayList<String> controlSTAnalyzer() {
-        // "if","else","for","while","switch","do"
         ArrayList<String> errors = new ArrayList<>();
 
         for (var row : lineasSinComentarios) {
             for (var index : Lists.charactersOf(row)) {
-                errors.add(indexGrouper(index, lineasSinComentarios.indexOf(row)));
+                var res = indexGrouper(index, codigoEnLineas.indexOf(row));
+                if (!Objects.isNull(res)) {
+                    errors.add(res);
+                }
             }
-            // TODO terminar esta parte ----V
+
+            /*
             // Verifica si es una ESTRUCTURA de CONTROL (if, for, while, switch)
             if (row.contains("if")) {
                 if (!(row.charAt(row.indexOf("if")+2) == '(')) errors.add("Error: '(' en la línea -> " + lineasSinComentarios.indexOf(row));
             } else if (row.contains("for")) {
-
+                if (!(row.charAt(row.indexOf("for")+3) == '(')) errors.add("Error: '(' en la línea -> " + lineasSinComentarios.indexOf(row));
             } else if (row.contains("while")) {
-
+                if (!(row.charAt(row.indexOf("while")+5) == '(')) errors.add("Error: '(' en la línea -> " + lineasSinComentarios.indexOf(row));
             } else if (row.contains("switch")) {
-
+                if (!(row.charAt(row.indexOf("switch")+6) == '(')) errors.add("Error: '(' en la línea -> " + lineasSinComentarios.indexOf(row));
             } else if (row.contains("do")) {
-
+                if (!(row.charAt(row.indexOf("do")+2) == '{')) errors.add("Error: '{' en la línea -> " + lineasSinComentarios.indexOf(row));
             } else if (row.contains("else")) {
-                // TODO special happening
-            }
+                // if (!(row.charAt(row.indexOf("if")+2) == '(')) errors.add("Error: '(' en la línea -> " + lineasSinComentarios.indexOf(row));
+            }*/
         }
 
         return errors;

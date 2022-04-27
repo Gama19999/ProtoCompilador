@@ -1,0 +1,25 @@
+.text-area {
+    -fx-text-fill: white;
+    -fx-font-family: Consolas;
+    -fx-fon-size: 14;
+    -fx-font-weight: bold;
+    -fx-background-color: #000000;
+}
+
+.text-area .content {
+    -fx-control-inner-background: #000000;
+    -fx-background-color: #000000;
+    -fx-opacity: 0.95;
+}
+
+.text-area .scroll-pane {
+    -fx-background-color: #000000;
+    -fx-opacity: 0.95;
+}
+
+.text-area .virtual-flow .scroll-bar:vertical .thumb,
+.text-area .virtual-flow .scroll-bar:horizontal .thumb {
+    -fx-background-color: #000000;
+    -fx-opacity: 0.95;
+}
+

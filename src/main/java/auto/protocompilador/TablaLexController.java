@@ -10,8 +10,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.layout.Border;
 
 public class TablaLexController {
     private ObservableList<ObservableList<String>> data;
@@ -52,7 +54,7 @@ public class TablaLexController {
         fillTable(data);
     }
     
-    public void fillTable(ObservableList<ObservableList<String>> data) {
+    private void fillTable(ObservableList<ObservableList<String>> data) {
         tabla.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         
         // Crear y agregar columnas a la tabla
@@ -62,7 +64,7 @@ public class TablaLexController {
             TableColumn<ObservableList<StringProperty>, String> col = new TableColumn<>(names.get(i));
             col.setCellValueFactory(celda -> celda.getValue().get(indice));
             col.setEditable(false);
-            col.setStyle("-fx-alignment: center; -fx-font-family: \"Comic Sans MS\"; -fx-font-weight: bold;");
+            col.setStyle("-fx-alignment: center; -fx-font-weight: bold;");
             tabla.getColumns().add(col);
         }
         
@@ -85,6 +87,11 @@ public class TablaLexController {
         data.add(FXCollections.observableArrayList());
         data.get(0).add("LEXEMA");
         data.get(0).add("TOKEN");
-        data.get(0).add("CANTIDAD"); 
+        data.get(0).add("CANTIDAD");
+
+        var label = new Label("Presione botón \"Mostrar datos\"");
+        label.setStyle("-fx-font-family: \"Comic Sans MS\"; -fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: white;");
+        tabla.setPlaceholder(label);
+        tabla.setBorder(Border.EMPTY);
     }
 }

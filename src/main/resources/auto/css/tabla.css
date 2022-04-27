@@ -1,0 +1,58 @@
+.table-view {
+	-fx-background-color: black;
+	-fx-opacity: 0.80;
+	-fx-font-family: "Comic Sans MS";
+	-fx-font-weight: bold;
+	-fx-font-size: 13;
+}
+
+.table-view .corner {
+    -fx-background-color: black;
+    -fx-opacity: 0.80;
+}
+
+.table-view .column-header,
+.table-view .column-header .filler,
+.table-view .column-header-background,
+.table-view .column-header-background .filler {
+	-fx-background-color: black;
+	-fx-text-fill: white;
+    -fx-text-background-color: white;
+    -fx-font-family: "Comic Sans MS";
+    -fx-font-weight: bold;
+    -fx-font-size: 16;
+}
+
+.table-view .virtual-flow .scroll-bar:vertical,
+.table-view .virtual-flow .scroll-bar:vertical .track,
+.table-view .virtual-flow .scroll-bar:vertical .track-background,
+.table-view .virtual-flow .scroll-bar:horizontal,
+.table-view .virtual-flow .scroll-bar:horizontal .track,
+.table-view .virtual-flow .scroll-bar:horizontal .track-background {
+	-fx-background-color: black;
+	-fx-opacity: 0.80;
+}
+
+.table-row-cell: hover {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+    -fx-text-background-color: white;
+}
+
+.table-row-cell: odd {
+    -fx-background-color: #2b2b2b;
+    -fx-text-fill: white;
+    -fx-text-background-color: white;
+}
+
+.table-row-cell: even {
+    -fx-background-color: black;
+    -fx-text-fill: white;
+    -fx-text-background-color: white;
+}
+
+.table-view .virtual-flow .scroll-bar:vertical .thumb,
+.table-view .virtual-flow .scroll-bar:horizontal .thumb {
+	-fx-background-color: white;
+	-fx-opacity: 0.80;
+}

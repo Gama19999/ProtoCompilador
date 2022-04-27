@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -10,53 +11,64 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" prefHeight="500.0" prefWidth="700.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="auto.protocompilador.InicioController">
+<VBox alignment="CENTER" prefHeight="600.0" prefWidth="1200.0" spacing="20.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="auto.protocompilador.InicioController">
    <padding>
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
    <children>
-      <AnchorPane prefHeight="480.0" prefWidth="680.0">
+      <AnchorPane prefHeight="600.0" prefWidth="900.0">
          <children>
-            <ImageView fitHeight="480.0" fitWidth="680.0" pickOnBounds="true">
+            <ImageView fitHeight="580.0" fitWidth="1180.0" pickOnBounds="true">
                <image>
                   <Image url="@../images/blue-background-ge61cbb2f5_1920.jpg" />
-               </image></ImageView>
-            <TextArea fx:id="area" editable="false" layoutX="67.0" layoutY="114.0" prefHeight="295.0" prefWidth="547.0">
+               </image>
+            </ImageView>
+            <Button fx:id="cargar" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="65.0" mnemonicParsing="false" onAction="#cargarPressed" prefHeight="0.0" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #1bffff;" text="CARGAR" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="Gabriola" size="24.0" />
+               </font>
+               <padding>
+                  <Insets bottom="-3.0" top="-5.0" />
+               </padding></Button>
+            <Button fx:id="lexico" alignment="CENTER" contentDisplay="CENTER" layoutX="40.0" layoutY="540.0" mnemonicParsing="false" onAction="#lexicoPressed" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #1bffff;" text="LÉXICO" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="Gabriola" size="24.0" />
+               </font>
+               <padding>
+                  <Insets bottom="-3.0" top="-5.0" />
+               </padding></Button>
+            <Button fx:id="sintactico" alignment="CENTER" contentDisplay="CENTER" layoutX="259.0" layoutY="540.0" mnemonicParsing="false" onAction="#sintacticoPressed" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #1bffff;" text="SINTÁCTICO" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="Gabriola" size="24.0" />
+               </font>
+               <padding>
+                  <Insets bottom="-3.0" top="-5.0" />
+               </padding></Button>
+            <Button fx:id="semantico" alignment="CENTER" contentDisplay="CENTER" layoutX="486.0" layoutY="540.0" mnemonicParsing="false" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #1bffff;" text="SEMÁNTICO" textAlignment="CENTER" textFill="WHITE">
+               <font>
+                  <Font name="Gabriola" size="24.0" />
+               </font>
+               <padding>
+                  <Insets bottom="-3.0" top="-5.0" />
+               </padding></Button>
+            <Label layoutX="239.0" layoutY="21.0" text="COMPILADOR PROTOTIPO DELTA 1.0" textFill="WHITE">
+               <font>
+                  <Font name="Tourner Regular" size="37.0" />
+               </font></Label>
+            <TableView fx:id="tabla" layoutX="40.0" layoutY="105.0" prefHeight="420.0" prefWidth="800.0" stylesheets="@../css/tabla.css" />
+            <TextArea fx:id="textErrores" editable="false" layoutX="880.0" layoutY="105.0" opacity="0.8" prefHeight="420.0" prefWidth="260.0" stylesheets="@../css/textErrores.css">
                <font>
                   <Font name="Consolas Bold" size="14.0" />
-               </font></TextArea>
-            <Button fx:id="cargar" layoutX="31.0" layoutY="65.0" mnemonicParsing="false" onAction="#cargarPressed" prefHeight="0.0" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="CARGAR" textFill="WHITE">
+               </font>
+            </TextArea>
+            <Button fx:id="guardar" alignment="CENTER" contentDisplay="CENTER" layoutX="710.0" layoutY="540.0" mnemonicParsing="false" onAction="#guardarPressed" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #1bffff;" text="GUARDAR" textAlignment="CENTER" textFill="WHITE">
                <font>
-                  <Font name="Gabriola" size="20.0" />
+                  <Font name="Gabriola" size="24.0" />
                </font>
                <padding>
-                  <Insets top="-1.0" />
-               </padding></Button>
-            <Button fx:id="lexico" layoutX="116.0" layoutY="431.0" mnemonicParsing="false" onAction="#lexicoPressed" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="LÉXICO" textFill="WHITE">
-               <font>
-                  <Font name="Gabriola" size="20.0" />
-               </font>
-               <padding>
-                  <Insets top="-1.0" />
-               </padding></Button>
-            <Button fx:id="sintactico" layoutX="275.0" layoutY="431.0" mnemonicParsing="false" onAction="#sintacticoPressed" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="SINTÁCTICO" textFill="WHITE">
-               <font>
-                  <Font name="Gabriola" size="20.0" />
-               </font>
-               <padding>
-                  <Insets top="-1.0" />
-               </padding></Button>
-            <Button fx:id="semantico" layoutX="434.0" layoutY="431.0" mnemonicParsing="false" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #6bffff;" text="SEMÁNTICO" textFill="WHITE">
-               <font>
-                  <Font name="Gabriola" size="20.0" />
-               </font>
-               <padding>
-                  <Insets top="-1.0" />
-               </padding></Button>
-            <Label layoutX="96.0" layoutY="22.0" text="COMPILADOR PROTOTIPO DELTA 1.0" textFill="WHITE">
-               <font>
-                  <Font name="Tourner Regular" size="25.0" />
-               </font></Label>
+                  <Insets bottom="-3.0" top="-5.0" />
+               </padding>
+            </Button>
          </children>
       </AnchorPane>
    </children>
