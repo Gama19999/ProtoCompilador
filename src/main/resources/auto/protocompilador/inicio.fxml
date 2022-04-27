@@ -51,7 +51,7 @@
                <padding>
                   <Insets bottom="-3.0" top="-5.0" />
                </padding></Button>
-            <Label layoutX="239.0" layoutY="21.0" text="COMPILADOR PROTOTIPO DELTA 1.0" textFill="WHITE">
+            <Label layoutX="239.0" layoutY="21.0" text="COMPILADOR PROTOTIPO DELTA 2.2" textFill="WHITE">
                <font>
                   <Font name="Tourner Regular" size="37.0" />
                </font></Label>

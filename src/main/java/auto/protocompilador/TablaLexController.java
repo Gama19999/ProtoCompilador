@@ -33,12 +33,13 @@ public class TablaLexController {
         Token t4 = App.analizer.getOperador();
         Token t5 = App.analizer.getPalabraReservada();
         Token t6 = App.analizer.getSimbolo();
-        List<Token> l = new ArrayList<>(Arrays.asList(t1,t2,t3,t4,t5,t6));
+        Token t7 = App.analizer.getNumero();
+        List<Token> l = new ArrayList<>(Arrays.asList(t1,t2,t3,t4,t5,t6,t7));
         
         System.out.println("CREANDO TABLA");
         HashMap<String, Integer> hm;
 
-        for (var x = 0; x < 6; ++x) {
+        for (var x = 0; x < 7; ++x) {
             hm = l.get(x).getLexemas(); // Obtiene el HashMap con los LEXEMAS de un tipo de TOKEN
             
             for (var p : hm.keySet()) {

@@ -30,6 +30,7 @@ public class Analizer {
     private String codigo;
     private final ArrayList<String> lineasSinComentarios;
     private final ArrayList<String> codigoEnLineas;
+    private final HashMap<String, Integer> lineaSC_codigoEnL;
 
     // PILA DE AGRUPADORES
     private final Stack<Character> groupers = new Stack<>();
@@ -60,6 +61,7 @@ public class Analizer {
         
         lineasSinComentarios = new ArrayList<>();
         codigoEnLineas = new ArrayList<>();
+        lineaSC_codigoEnL = new HashMap<>();
     }
     
     /**
@@ -127,6 +129,7 @@ public class Analizer {
             if (lineas.get(i).contains("//")) {
                 posI = lineas.get(i).indexOf("//");
                 lineasSinComentarios.add(lineas.get(i).substring(0, posI));
+                lineaSC_codigoEnL.put(lineasSinComentarios.get(lineasSinComentarios.size()-1), i+1);
             } else if (lineas.get(i).contains("/*")) {
                 posI = lineas.get(i).indexOf("/*");
 		        linTemp.append(lineas.get(i).substring(0, posI));
@@ -136,12 +139,24 @@ public class Analizer {
                 posF = lineas.get(i).indexOf("*/");
                 linTemp.append(lineas.get(i).substring(posF+2, lineas.get(i).length()));
 		        lineasSinComentarios.add(linTemp.toString());
+                lineaSC_codigoEnL.put(lineasSinComentarios.get(lineasSinComentarios.size()-1), i+1);
             } else if (lineas.get(i).contains("*/")) {
                 posF = lineas.get(i).indexOf("*/");
 		        linTemp.append("\n").append(lineas.get(i).substring(posF+2, lineas.get(i).length()));
                 lineasSinComentarios.add(linTemp.toString());
+                lineaSC_codigoEnL.put(lineasSinComentarios.get(lineasSinComentarios.size()-1), i+1);
             } else {
-                lineasSinComentarios.add(lineas.get(i));
+                if (lineas.get(i).contains("\"")) {
+                    var start = lineas.get(i).indexOf("\"");
+                    var end = lineas.get(i).lastIndexOf("\"");
+
+                    var stringWithNoString = lineas.get(i).substring(0, start) + lineas.get(i).substring(end+1);
+                    lineasSinComentarios.add(stringWithNoString);
+                    lineaSC_codigoEnL.put(lineasSinComentarios.get(lineasSinComentarios.size()-1), i+1);
+                } else {
+                    lineasSinComentarios.add(lineas.get(i));
+                    lineaSC_codigoEnL.put(lineasSinComentarios.get(lineasSinComentarios.size()-1), i+1);
+                }
             }
         }
 
@@ -233,7 +248,7 @@ public class Analizer {
      * @return ArrayList de cadenas con los posibles errores en el codigo y la linea de estos
      */
     public ArrayList<String> controlStructuresAnalizer() {
-        ArrayList<String> control = new ArrayList<>(Arrays.asList("if","for","while","switch"));
+        ArrayList<String> control = new ArrayList<>(Arrays.asList("if","for","while","switch","do"));
         Stack<String> pila = new Stack<>();
         ArrayList<String> errores = new ArrayList<>();
 
@@ -276,18 +291,20 @@ public class Analizer {
                             } else {
                                 var error = new StringBuilder();
                                 error.append("Error: '{' en la línea -> ");
-                                codigoEnLineas.forEach(l -> {
-                                    if (l.contains(fila)) error.append(codigoEnLineas.indexOf(l)+1);
+                                lineaSC_codigoEnL.forEach((key, value) -> {
+                                    if (key.equals(fila)) {
+                                        error.append(value);
+                                    }
                                 });
+                                /*codigoEnLineas.forEach(l -> {
+                                    if (l.contains(fila)) error.append(codigoEnLineas.indexOf(l)+1);
+                                });*/
                                 errores.add(error.toString());
                             }
                         }
                     }
                 }
-                case "else" -> {
-
-                }
-                case "if","for","while","switch" -> {
+                case "if" -> {
                     for (var pos = 0; pos < fila.length(); ++pos) {
                         if (Lists.charactersOf(fila).get(pos) == '(') {
                             pila.push("(");
@@ -300,8 +317,10 @@ public class Analizer {
                             } else {
                                 var error = new StringBuilder();
                                 error.append("Error: '(' en la línea -> ");
-                                codigoEnLineas.forEach(l -> {
-                                    if (l.contains(fila)) error.append(codigoEnLineas.indexOf(l)+1);
+                                lineaSC_codigoEnL.forEach((key, value) -> {
+                                    if (key.equals(fila)) {
+                                        error.append(value);
+                                    }
                                 });
                                 errores.add(error.toString());
                             }
@@ -316,10 +335,155 @@ public class Analizer {
                             } else {
                                 var error = new StringBuilder();
                                 error.append("Error: '{' en la línea -> ");
-                                codigoEnLineas.forEach(l -> {
-                                    if (l.contains(fila)) error.append(codigoEnLineas.indexOf(l)+1);
+                                lineaSC_codigoEnL.forEach((key, value) -> {
+                                    if (key.equals(fila)) {
+                                        error.append(value);
+                                    }
                                 });
                                 errores.add(error.toString());
+                            }
+                        }
+                    }
+
+                    if (fila.contains("else")) {
+                        for (var pos = fila.indexOf("else")+4; pos < fila.length(); ++pos) {
+                            if (Lists.charactersOf(fila).get(pos) == 'i' && Lists.charactersOf(fila).get(pos) == 'f') {
+                                var x = controlStructuresAnalizer();
+                                errores.addAll(x);
+                            } else if (Lists.charactersOf(fila).get(pos) == '{') {
+                                pila.push("{");
+                                System.out.println("Push: {");
+                            }
+                            else if (Lists.charactersOf(fila).get(pos) == '}') {
+                                if (pila.peek().equals("{")) {
+                                    pila.pop();
+                                    System.out.println("Pop: }");
+                                } else {
+                                    var error = new StringBuilder();
+                                    error.append("Error: '{' en la línea -> ");
+                                    lineaSC_codigoEnL.forEach((key, value) -> {
+                                        if (key.equals(fila)) {
+                                            error.append(value);
+                                        }
+                                    });
+                                    errores.add(error.toString());
+                                }
+                            }
+                        }
+                    }
+                }
+                case "for","while" -> {
+                    for (var pos = 0; pos < fila.length(); ++pos) {
+                        if (Lists.charactersOf(fila).get(pos) == '(') {
+                            pila.push("(");
+                            System.out.println("Push: (");
+                        }
+                        else if (Lists.charactersOf(fila).get(pos) == ')') {
+                            if (pila.peek().equals("(")) {
+                                pila.pop();
+                                System.out.println("Pop: )");
+                            } else {
+                                var error = new StringBuilder();
+                                error.append("Error: '(' en la línea -> ");
+                                lineaSC_codigoEnL.forEach((key, value) -> {
+                                    if (key.equals(fila)) {
+                                        error.append(value);
+                                    }
+                                });
+                                errores.add(error.toString());
+                            }
+                        } else if (Lists.charactersOf(fila).get(pos) == '{') {
+                            pila.push("{");
+                            System.out.println("Push: {");
+                        }
+                        else if (Lists.charactersOf(fila).get(pos) == '}') {
+                            if (pila.peek().equals("{")) {
+                                pila.pop();
+                                System.out.println("Pop: }");
+                            } else {
+                                var error = new StringBuilder();
+                                error.append("Error: '{' en la línea -> ");
+                                lineaSC_codigoEnL.forEach((key, value) -> {
+                                    if (key.equals(fila)) {
+                                        error.append(value);
+                                    }
+                                });
+                                errores.add(error.toString());
+                            }
+                        }
+                    }
+                }
+                case "switch" -> {
+                    for (var pos = 0; pos < fila.length(); ++pos) {
+                        if (Lists.charactersOf(fila).get(pos) == '(') {
+                            pila.push("(");
+                            System.out.println("Push: (");
+                        }
+                        else if (Lists.charactersOf(fila).get(pos) == ')') {
+                            if (pila.peek().equals("(")) {
+                                pila.pop();
+                                System.out.println("Pop: )");
+                            } else {
+                                var error = new StringBuilder();
+                                error.append("Error: '(' en la línea -> ");
+                                lineaSC_codigoEnL.forEach((key, value) -> {
+                                    if (key.equals(fila)) {
+                                        error.append(value);
+                                    }
+                                });
+                                errores.add(error.toString());
+                            }
+                        } else if (Lists.charactersOf(fila).get(pos) == '{') {
+                            pila.push("{");
+                            System.out.println("Push: {");
+                        }
+                        else if (Lists.charactersOf(fila).get(pos) == '}') {
+                            if (pila.peek().equals("{")) {
+                                pila.pop();
+                                System.out.println("Pop: }");
+                            } else {
+                                var error = new StringBuilder();
+                                error.append("Error: '{' en la línea -> ");
+                                lineaSC_codigoEnL.forEach((key, value) -> {
+                                    if (key.equals(fila)) {
+                                        error.append(value);
+                                    }
+                                });
+                                errores.add(error.toString());
+                            }
+                        }
+
+                        if (fila.contains("case")) {
+                            for (var id : getIdentificador().getLexemas().keySet()) {
+                                if (fila.contains(id)) {
+                                    var posColon = fila.indexOf("case") + 5 + id.length();
+                                    if (fila.charAt(posColon) != ':') {
+                                        var error = new StringBuilder();
+                                        error.append("Error: ':' en la línea -> ");
+                                        lineaSC_codigoEnL.forEach((key, value) -> {
+                                            if (key.equals(fila)) {
+                                                error.append(value);
+                                            }
+                                        });
+                                        errores.add(error.toString());
+                                    }
+                                }
+                            }
+
+                            for (var id : getNumero().getLexemas().keySet()) {
+                                if (fila.contains(id)) {
+                                    var posColon = fila.indexOf("case") + 5 + id.length();
+                                    if (fila.charAt(posColon) != ':') {
+                                        var error = new StringBuilder();
+                                        error.append("Error: ':' en la línea -> ");
+                                        lineaSC_codigoEnL.forEach((key, value) -> {
+                                            if (key.equals(fila)) {
+                                                error.append(value);
+                                            }
+                                        });
+                                        errores.add(error.toString());
+                                    }
+                                }
                             }
                         }
                     }
@@ -332,11 +496,19 @@ public class Analizer {
                     pila.pop();
                     palabra = "";
                     System.out.println("Pop: "+palabra);
-                } else if (pila.peek().equals("{")) {
-                    continue outter;
-                } else {
+                } else if (palabra.equals("")) {
+                    var structure = "";
+                    Object[] kw = pila.toArray();
+                    for (var j : kw) {
+                        if (control.contains(j.toString())) structure = j.toString();
+                        break;
+                    }
+                    errores.add("Error: '" + pila.peek() + "' en estructura -> " + structure);
+                    pila.pop();
+                } /*else {
                     errores.add("Error: '" + pila.peek() + "' en la línea -> " + lineaPalabra[0]);
-                }
+                    pila.pop();
+                }*/
             }
 
         }
@@ -431,8 +603,16 @@ public class Analizer {
         return identificador;
     }
 
+    public Token getNumero() {
+        return numero;
+    }
+
     public Token getBlanksOrUnknown() {
         return blanksOrUnknown;
+    }
+
+    public int getLineasCodigo() {
+        return codigoEnLineas.size();
     }
     
 }

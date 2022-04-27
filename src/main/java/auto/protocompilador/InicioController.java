@@ -89,6 +89,8 @@ public class InicioController {
 
     @FXML
     private void guardarPressed() throws IOException {
+        textErrores.setVisible(false);
+
         fileChooser.setTitle("Guardar archivo de código fuente");
         File modifiedFile = fileChooser.showSaveDialog(guardar.getScene().getWindow());
 
@@ -97,7 +99,7 @@ public class InicioController {
             BufferedWriter bw = new BufferedWriter(fw);
 
             for (var fila : tabla.getItems()) {
-                bw.write(fila.get(1).getValue());
+                bw.write((fila.get(1).getValue() + "\n"));
             }
 
             bw.close();
