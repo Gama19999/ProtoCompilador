@@ -70,7 +70,7 @@ public class InicioController {
 
     @FXML
     private void sintacticoPressed() {
-        var errores = App.analizer.controlStructuresAnalizer();
+        var errores = App.analizer.ctrlStructsAnalizer(0);
         var cadenaErr = new StringBuilder();
 
         cadenaErr.append("    # ERRORES ENCONTRADOS #").append("\n\n");

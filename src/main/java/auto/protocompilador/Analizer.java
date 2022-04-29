@@ -3,6 +3,7 @@ package auto.protocompilador;
 import com.google.common.collect.Lists;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.util.Pair;
 
 import java.io.*;
 import java.util.*;
@@ -243,6 +244,254 @@ public class Analizer {
         }
     }
 
+    public ArrayList<String> ctrlStructsAnalizer(int nfila) {
+        Stack<String> pila = new Stack<>();
+        ArrayList<String> errores = new ArrayList<>();
+        String structure = "";
+        var ctrlStructures = 0;
+
+        for (var t : lineasSinComentarios) {
+            if (t.contains("if") || t.contains("else") || t.contains("for") || t.contains("while") ||
+                t.contains("switch") || t.contains("do")) {
+                ctrlStructures++;
+            }
+        }
+
+        for (var fila = nfila; fila < lineasSinComentarios.size()-2; fila++) {
+            var row = lineasSinComentarios.get(fila);
+            System.out.println(ctrlStructures);
+            System.out.println(fila);
+
+            if (row.contains("if")) {
+                /*if (!pila.isEmpty()) {
+                    // var resAnidado = ctrlStructsAnalizer(fila);
+                    // errores.addAll(resAnidado);
+                } else {*/
+                    structure = "if";
+                    pila.push(structure);
+                    System.out.println("Push: "+structure);
+                    if (!row.contains("{")) {
+                        var error = new StringBuilder();
+                        error.append("Error: '{' en la línea -> ");
+                        lineaSC_codigoEnL.forEach((key, value) -> {
+                            if (key.equals(row)) {
+                                error.append(value);
+                            }
+                        });
+                        errores.add(error.toString());
+                    }
+                // }
+            } else if (row.contains("for")) {
+                /*if (!pila.isEmpty()) {
+                    // var resAnidado = ctrlStructsAnalizer(fila);
+                    // errores.addAll(resAnidado);
+                } else {*/
+                    structure = "for";
+                    pila.push(structure);
+                    System.out.println("Push: "+structure);
+                    if (!row.contains("{")) {
+                        var error = new StringBuilder();
+                        error.append("Error: '{' en la línea -> ");
+                        lineaSC_codigoEnL.forEach((key, value) -> {
+                            if (key.equals(row)) {
+                                error.append(value);
+                            }
+                        });
+                        errores.add(error.toString());
+                    }
+                // }
+            } else if (row.contains("while")) {
+                /*if (!pila.isEmpty()) {
+                    if (structure.equals("do")) {
+                        if (!row.contains("}")) {
+                            var error = new StringBuilder();
+                            error.append("Error: '}' en la línea -> ");
+                            lineaSC_codigoEnL.forEach((key, value) -> {
+                                if (key.equals(row)) {
+                                    error.append(value);
+                                }
+                            });
+                            errores.add(error.toString());
+                        }
+                    } else {*/
+                        // var resAnidado = ctrlStructsAnalizer(fila);
+                        // errores.addAll(resAnidado);
+                    // }
+                // } else {
+                    structure = "while";
+                    pila.push(structure);
+                    System.out.println("Push: "+structure);
+                    if (!row.contains("{")) {
+                        var error = new StringBuilder();
+                        error.append("Error: '{' en la línea -> ");
+                        lineaSC_codigoEnL.forEach((key, value) -> {
+                            if (key.equals(row)) {
+                                error.append(value);
+                            }
+                        });
+                        errores.add(error.toString());
+                    }
+                // }
+            } else if (row.contains("switch")) {
+                /*if (!pila.isEmpty()) {
+                    // var resAnidado = ctrlStructsAnalizer(fila);
+                    // errores.addAll(resAnidado);
+                } else {*/
+                    structure = "switch";
+                    pila.push(structure);
+                    System.out.println("Push: "+structure);
+                    if (!row.contains("{")) {
+                        var error = new StringBuilder();
+                        error.append("Error: '{' en la línea -> ");
+                        lineaSC_codigoEnL.forEach((key, value) -> {
+                            if (key.equals(row)) {
+                                error.append(value);
+                            }
+                        });
+                        errores.add(error.toString());
+                    }
+                // }
+            } /*else if (row.contains("do")) {
+                if (!pila.isEmpty()) {
+                    var resAnidado = ctrlStructsAnalizer(fila);
+                    errores.addAll(resAnidado);
+                } else {
+                    structure = "do";
+                    pila.push(structure);
+                    if (!row.contains("{")) {
+                        var error = new StringBuilder();
+                        error.append("Error: '{' en la línea -> ");
+                        lineaSC_codigoEnL.forEach((key, value) -> {
+                            if (key.equals(row)) {
+                                error.append(value);
+                            }
+                        });
+                        errores.add(error.toString());
+                    }
+                }
+            }*/ else if (row.contains("else")) {
+                if (!pila.isEmpty()) {
+                    if (structure.equals("if")) {
+                        if (!row.contains("}")) {
+                            var error = new StringBuilder();
+                            error.append("Error: '}' en la línea -> ");
+                            lineaSC_codigoEnL.forEach((key, value) -> {
+                                if (key.equals(row)) {
+                                    error.append(value);
+                                }
+                            });
+                            errores.add(error.toString());
+                        }
+                    }
+                } else {
+                    var error = new StringBuilder();
+                    error.append("Error: 'else sin bloque if' en la línea -> ");
+                    lineaSC_codigoEnL.forEach((key, value) -> {
+                        if (key.equals(row)) {
+                            error.append(value);
+                        }
+                    });
+                    errores.add(error.toString());
+                }
+            }
+
+            if (structure.equals("switch")) {
+                if (row.contains("case")) System.out.println("contiene case");
+
+            }
+
+            try {
+                for (var pos = 0; pos < row.length(); ++pos) {
+                    if (Lists.charactersOf(row).get(pos) == '(') {
+                        pila.push("(");
+                        System.out.println("Push: (");
+                    } else if (Lists.charactersOf(row).get(pos) == ')') {
+                        if (pila.peek().equals("(")) {
+                            pila.pop();
+                            System.out.println("Pop: )");
+                        } else {
+                            var error = new StringBuilder();
+                            error.append("Error: '(' en la línea -> ");
+                            lineaSC_codigoEnL.forEach((key, value) -> {
+                                if (key.equals(row)) {
+                                    error.append(value);
+                                }
+                            });
+                            errores.add(error.toString());
+                        }
+                    } else if (Lists.charactersOf(row).get(pos) == '{') {
+                        pila.push("{");
+                        System.out.println("Push: {");
+                    } else if (Lists.charactersOf(row).get(pos) == '}') {
+                        if (pila.peek().equals("{")) {
+                            pila.pop();
+                            System.out.println("Pop: }");
+
+                            if (pila.peek().equals("if")) {
+                                if (row.contains("else")) {
+                                    structure = "else";
+                                    pila.push(structure);
+                                }
+                            }
+                        } else {
+                            var error = new StringBuilder();
+                            error.append("Error: '{' en la línea -> ");
+                            lineaSC_codigoEnL.forEach((key, value) -> {
+                                if (key.equals(row)) {
+                                    error.append(value);
+                                }
+                            });
+                            errores.add(error.toString());
+                        }
+                    }
+
+                    if (pos == row.length() - 1) {
+                        if (!pila.isEmpty()) {
+                            pila.forEach(i -> {
+                                if (i.equals("(")) {
+                                    var error = new StringBuilder();
+                                    error.append("Error: ')' en la línea -> ");
+                                    lineaSC_codigoEnL.forEach((key, value) -> {
+                                        if (key.equals(row)) {
+                                            error.append(value);
+                                        }
+                                    });
+                                    errores.add(error.toString());
+
+                                    pila.removeElement(i);
+                                    System.out.println("Removing '(' as error");
+                                }
+                            });
+                        }
+                    }
+
+                }
+            } catch (Exception e) {
+                System.out.println("Pila vacía????");
+            }
+
+            if (ctrlStructures == 0) break;
+
+            if (!pila.isEmpty()) {
+                if (pila.peek().equals(structure)) {
+                    pila.pop();
+                    ctrlStructures--;
+                    if (structure.equals("else")) structure = "if";
+                    System.out.println("Pop: "+structure);
+                    structure = "";
+                } else if (pila.peek().equals("(")) {
+                    errores.add("Error: '" + pila.peek() + "' en estructura -> " + structure);
+                }
+            }
+
+            /*if (closingBraces.contains(fila)) {
+                if (!pila.isEmpty())
+            }*/
+        }
+
+        return errores;
+    }
+
     /**
      * Analiza el codigo fuente y verifica la integridad de las estructuras de control<p>"if","else","for","while","switch","do"</p>
      * @return ArrayList de cadenas con los posibles errores en el codigo y la linea de estos
@@ -253,6 +502,7 @@ public class Analizer {
         ArrayList<String> errores = new ArrayList<>();
 
         var palabra = "";
+        int[] llavePrincipalOpen = {-1, -1};
         int[] lineaPalabra = {0};
 
         outter:
@@ -326,18 +576,24 @@ public class Analizer {
                             }
                         } else if (Lists.charactersOf(fila).get(pos) == '{') {
                             pila.push("{");
+                            llavePrincipalOpen[0] = 0;
+                            llavePrincipalOpen[1] = 0;
                             System.out.println("Push: {");
                         }
                         else if (Lists.charactersOf(fila).get(pos) == '}') {
                             if (pila.peek().equals("{")) {
                                 pila.pop();
+                                llavePrincipalOpen[0] = 0;
+                                llavePrincipalOpen[1] = 0;
                                 System.out.println("Pop: }");
                             } else {
                                 var error = new StringBuilder();
                                 error.append("Error: '{' en la línea -> ");
+                                llavePrincipalOpen[0] = -1;
                                 lineaSC_codigoEnL.forEach((key, value) -> {
                                     if (key.equals(fila)) {
                                         error.append(value);
+                                        llavePrincipalOpen[1] = value;
                                     }
                                 });
                                 errores.add(error.toString());
@@ -488,15 +744,55 @@ public class Analizer {
                         }
                     }
                 }
-                default -> System.out.println("termino un bloque");
+                default -> {
+                    /*for (var pos = 0; pos < fila.length(); ++pos) {
+                        if (Lists.charactersOf(fila).get(pos) == '(') {
+                            pila.push("(");
+                            System.out.println("Push: (");
+                        } else if (Lists.charactersOf(fila).get(pos) == ')') {
+                            if (!pila.isEmpty() && pila.peek().equals("(")) {
+                                pila.pop();
+                                System.out.println("Pop: )");
+                            } else {
+                                var error = new StringBuilder();
+                                error.append("Error: '(' en la línea -> ");
+                                lineaSC_codigoEnL.forEach((key, value) -> {
+                                    if (key.equals(fila)) {
+                                        error.append(value);
+                                    }
+                                });
+                                errores.add(error.toString());
+                            }
+                        } else if (Lists.charactersOf(fila).get(pos) == '{') {
+                            pila.push("{");
+                            System.out.println("Push: {");
+                        } else if (Lists.charactersOf(fila).get(pos) == '}') {
+                            if (!pila.isEmpty() && pila.peek().equals("{")) {
+                                pila.pop();
+                                System.out.println("Pop: }");
+                            } else {
+                                var error = new StringBuilder();
+                                error.append("Error: '{' en la línea -> ");
+                                lineaSC_codigoEnL.forEach((key, value) -> {
+                                    if (key.equals(fila)) {
+                                        error.append(value);
+                                    }
+                                });
+                                errores.add(error.toString());
+                            }
+                        }
+                    }*/
+                }
             }
 
             if (!pila.isEmpty()) {
-                if (pila.peek().equals(palabra)) {
+                if (llavePrincipalOpen[0] == -1) {
+                    errores.add("Error: '{' en la línea -> " + llavePrincipalOpen[1]);
+                } else if (pila.peek().equals(palabra)) {
                     pila.pop();
                     palabra = "";
                     System.out.println("Pop: "+palabra);
-                } else if (palabra.equals("")) {
+                } /*else if (palabra.equals("")) {
                     var structure = "";
                     Object[] kw = pila.toArray();
                     for (var j : kw) {
@@ -504,9 +800,6 @@ public class Analizer {
                         break;
                     }
                     errores.add("Error: '" + pila.peek() + "' en estructura -> " + structure);
-                    pila.pop();
-                } /*else {
-                    errores.add("Error: '" + pila.peek() + "' en la línea -> " + lineaPalabra[0]);
                     pila.pop();
                 }*/
             }
