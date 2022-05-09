@@ -62,7 +62,7 @@ public class InicioController {
         Scene scene = new Scene(App.loadFXML("tablaLex"), 590, 600);
 
         stage.getIcons().add(new Image("https://cdn-icons-png.flaticon.com/512/1179/1179782.png"));
-        stage.setTitle("Analizador Lexico");
+        stage.setTitle("Analizador Léxico");
         stage.setResizable(false);
         stage.setScene(scene);
         stage.show();
@@ -83,8 +83,17 @@ public class InicioController {
     }
 
     @FXML
-    private void semanticoPressed() {
+    private void semanticoPressed() throws IOException {
+        textErrores.setVisible(false);
 
+        Stage stage = new Stage();
+        Scene scene = new Scene(App.loadFXML("tablaSem"), 1200, 600);
+
+        stage.getIcons().add(new Image("https://cdn-icons-png.flaticon.com/512/1179/1179782.png"));
+        stage.setTitle("Analizador Semántico");
+        stage.setResizable(false);
+        stage.setScene(scene);
+        stage.show();
     }
 
     @FXML

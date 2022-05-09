@@ -44,7 +44,7 @@
                <padding>
                   <Insets bottom="-3.0" top="-5.0" />
                </padding></Button>
-            <Button fx:id="semantico" alignment="CENTER" contentDisplay="CENTER" layoutX="486.0" layoutY="540.0" mnemonicParsing="false" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #1bffff;" text="SEMÁNTICO" textAlignment="CENTER" textFill="WHITE">
+            <Button fx:id="semantico" alignment="CENTER" contentDisplay="CENTER" layoutX="486.0" layoutY="540.0" mnemonicParsing="false" onAction="#semanticoPressed" prefWidth="130.0" style="-fx-border-color: white; -fx-background-color: none; -fx-border-radius: 10; -fx-border-width: 3; -fx-border-color: #1bffff;" text="SEMÁNTICO" textAlignment="CENTER" textFill="WHITE">
                <font>
                   <Font name="Gabriola" size="24.0" />
                </font>

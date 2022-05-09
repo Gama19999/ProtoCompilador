@@ -1,9 +1,5 @@
 package auto.protocompilador;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
@@ -15,49 +11,50 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.layout.Border;
 
-public class TablaLexController {
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class TablaSemController {
+
     private ObservableList<ObservableList<String>> data;
-    
-    @FXML
-    private Button tablaOn;
-    
+
     @FXML
     private TableView<ObservableList<StringProperty>> tabla;
-    
+
+    @FXML
+    private Button tablaOn;
+
     @FXML
     private void tablaOnPressed() {
-        App.analizer.tokenLexe(); // HACE EL ANALISIS LEXICO ---- AAAAAAAAAA! QUE FEOOOOOOO!
-        Token t1 = App.analizer.getAgrupador();
-        Token t2 = App.analizer.getDelimitador();
         Token t3 = App.analizer.getIdentificador();
-        Token t4 = App.analizer.getOperador();
-        Token t5 = App.analizer.getPalabraReservada();
-        Token t6 = App.analizer.getSimbolo();
-        Token t7 = App.analizer.getNumero();
-        List<Token> l = new ArrayList<>(Arrays.asList(t1,t2,t3,t4,t5,t6,t7));
-        
-        System.out.println("CREANDO TABLA");
-        HashMap<String, Integer> hm;
+        ArrayList<String[]> vars = App.analizer.getVariables();
+        HashMap<String, Integer> hm = t3.getLexemas();
 
-        for (var x = 0; x < 7; ++x) {
-            hm = l.get(x).getLexemas(); // Obtiene el HashMap con los LEXEMAS de un tipo de TOKEN
-            
-            for (var p : hm.keySet()) {
-                data.add(FXCollections.observableArrayList()); // Agrega una tupla
-                
-                int index = data.size() - 1;
-                data.get(index).add(p);                     // Agrega el LEXEMA
-                data.get(index).add(l.get(x).getToken());   // Agrega el tipo de TOKEN
-                data.get(index).add(hm.get(p).toString());  // Agrega la CANTIDAD de veces
-            }            
+        for (var lexema : hm.keySet()) {
+            vars.forEach(p -> {
+                if (p[0].equals(lexema)) {
+                    p[3] = String.valueOf(hm.get(lexema));
+                }
+            });
         }
-        
+
+        for (var v : vars) {
+            data.add(FXCollections.observableArrayList()); // Agrega una tupla
+
+            int index = data.size() - 1;
+            data.get(index).add(v[0]);  // Agrega el IDENTIFICADOR
+            data.get(index).add(v[1]);  // Agrega el TIPO de variable
+            data.get(index).add(v[2]);  // Agrega la linea del 1° USO
+            data.get(index).add(v[3]);  // Agrega la CANTIDAD de veces
+            data.get(index).add(v[4]);  // Agrega si la variable es declarada CORRETAMENTE
+        }
+
         fillTable(data);
     }
-    
+
     private void fillTable(ObservableList<ObservableList<String>> info) {
         tabla.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        
+
         // Crear y agregar columnas a la tabla
         ObservableList<String> names = info.remove(0);
         for (var i = 0; i < names.size(); ++i) {
@@ -68,7 +65,7 @@ public class TablaLexController {
             col.setStyle("-fx-alignment: center; -fx-font-weight: bold;");
             tabla.getColumns().add(col);
         }
-        
+
         // Agregar los datos a la tabla
         for (var fila : info) {
             ObservableList<StringProperty> tuplas = FXCollections.observableArrayList();
@@ -77,22 +74,25 @@ public class TablaLexController {
             }
             tabla.getItems().add(tuplas);
         }
-        
+
         tabla.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
-    
+
     @FXML
     void initialize() {
         data = FXCollections.observableArrayList();
-        
+
         data.add(FXCollections.observableArrayList());
-        data.get(0).add("LEXEMA");
-        data.get(0).add("TOKEN");
+        data.get(0).add("VARIABLE");
+        data.get(0).add("TIPO");
+        data.get(0).add("1° USO");
         data.get(0).add("CANTIDAD");
+        data.get(0).add("DECLARACIÓN");
 
         var label = new Label("Presione botón \"Mostrar datos\"");
         label.setStyle("-fx-font-family: \"Comic Sans MS\"; -fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: white;");
         tabla.setPlaceholder(label);
         tabla.setBorder(Border.EMPTY);
     }
+
 }

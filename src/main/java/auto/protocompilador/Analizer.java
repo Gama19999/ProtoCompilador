@@ -3,7 +3,6 @@ package auto.protocompilador;
 import com.google.common.collect.Lists;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.util.Pair;
 
 import java.io.*;
 import java.util.*;
@@ -26,6 +25,8 @@ public class Analizer {
     private final Token identificador;
     private final Token blanksOrUnknown;
     private final ArrayList<String> reservedWords;
+
+    private final ArrayList<String[]> variables;
 
     // CODIGO
     private String codigo;
@@ -59,6 +60,8 @@ public class Analizer {
                 "super","switch","synchronized","this","throw","throws",
                 "transient","true","try","void","volatile","while"
         ));
+
+        variables = new ArrayList<>();
         
         lineasSinComentarios = new ArrayList<>();
         codigoEnLineas = new ArrayList<>();
@@ -234,7 +237,9 @@ public class Analizer {
                                 if (reservedWords.contains(mat.group())) {
                                     palabraReservada.addLexema(mat.group(0));
                                 } else {
-                                    identificador.addLexema(mat.group(0));
+                                    var lex = mat.group(0);
+                                    identificador.addLexema(lex);
+                                    seekVariables(row, lex);
                                 }
                             }
                         }
@@ -244,6 +249,67 @@ public class Analizer {
         }
     }
 
+    /**
+     * Metodo que analiza un identificador, determina su tipo y la primera linea de uso
+     * @param linea Linea del codigo a analizar
+     * @param id Lexema identificador a analizar
+     */
+    private void seekVariables(int linea, String id) {
+        var type = Character.isUpperCase(id.charAt(0)) ? "Object" : "Variable";
+        boolean[] varAlreadyChecked = {false};
+
+        variables.forEach(i -> {
+            if (i[0].equals(id) && i[5].equals("false")) {
+                lineaSC_codigoEnL.forEach((key, value) -> {
+                    if (key.equals(lineasSinComentarios.get(linea))) {
+                        i[2] = String.valueOf(value);
+                    }
+                });
+                i[5] = "true";
+                varAlreadyChecked[0] = true;
+            }
+        });
+
+        if (!varAlreadyChecked[0]) {
+            switch (type) {
+                case "Object" -> {
+                    variables.add(new String[]{"", id, "", "", "CORRECTA", "false"});
+                }
+                case "Variable" -> {
+                    if (lineasSinComentarios.get(linea).contains("int")) {
+                        variables.add(new String[]{id, "int", "", "", "CORRECTA", "false"});
+                    } else if (lineasSinComentarios.get(linea).contains("float")) {
+                        variables.add(new String[]{id, "float", "", "", "CORRECTA", "false"});
+                    } else if (lineasSinComentarios.get(linea).contains("double")) {
+                        variables.add(new String[]{id, "double", "", "", "CORRECTA", "false"});
+                    } else if (lineasSinComentarios.get(linea).contains("byte")) {
+                        variables.add(new String[]{id, "byte", "", "", "CORRECTA", "false"});
+                    } else if (lineasSinComentarios.get(linea).contains("long")) {
+                        variables.add(new String[]{id, "long", "", "", "CORRECTA", "false"});
+                    } else if (lineasSinComentarios.get(linea).contains("short")) {
+                        variables.add(new String[]{id, "short", "", "", "CORRECTA", "false"});
+                    } else if (lineasSinComentarios.get(linea).contains("char")) {
+                        variables.add(new String[]{id, "char", "", "", "CORRECTA", "false"});
+                    } else if (lineasSinComentarios.get(linea).contains("boolean")) {
+                        variables.add(new String[]{id, "boolean", "", "", "CORRECTA", "false"});
+                    } else {
+                        variables.forEach(i -> {
+                            if (lineasSinComentarios.get(linea).contains(i[1]) && i[0].equals("")) {
+                                i[0] = id;
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Analiza el codigo fuente y verifica la integridad de las estructuras de control<br>
+     * "if","else","for","while","switch","do"
+     * @param nfila Indice de la fila donde comienza el analisis del codigo
+     * @return ArrayList de cadenas con los posibles errores en el codigo y la linea de estos
+     */
     public ArrayList<String> ctrlStructsAnalizer(int nfila) {
         Stack<String> pila = new Stack<>();
         ArrayList<String> errores = new ArrayList<>();
@@ -322,14 +388,16 @@ public class Analizer {
                     pila.push(structure);
                     System.out.println("Push: "+structure);
                     if (!row.contains("{")) {
-                        var error = new StringBuilder();
-                        error.append("Error: '{' en la línea -> ");
-                        lineaSC_codigoEnL.forEach((key, value) -> {
-                            if (key.equals(row)) {
-                                error.append(value);
-                            }
-                        });
-                        errores.add(error.toString());
+                        if (!pila.contains("do")) {
+                            var error = new StringBuilder();
+                            error.append("Error: '{' en la línea -> ");
+                            lineaSC_codigoEnL.forEach((key, value) -> {
+                                if (key.equals(row)) {
+                                    error.append(value);
+                                }
+                            });
+                            errores.add(error.toString());
+                        }
                     }
                 // }
             } else if (row.contains("switch")) {
@@ -351,11 +419,11 @@ public class Analizer {
                         errores.add(error.toString());
                     }
                 // }
-            } /*else if (row.contains("do")) {
-                if (!pila.isEmpty()) {
+            } else if (row.contains("do")) {
+                /*if (!pila.isEmpty()) {
                     var resAnidado = ctrlStructsAnalizer(fila);
                     errores.addAll(resAnidado);
-                } else {
+                } else {*/
                     structure = "do";
                     pila.push(structure);
                     if (!row.contains("{")) {
@@ -368,8 +436,8 @@ public class Analizer {
                         });
                         errores.add(error.toString());
                     }
-                }
-            }*/ else if (row.contains("else")) {
+                // }
+            } else if (row.contains("else")) {
                 if (!pila.isEmpty()) {
                     if (structure.equals("if")) {
                         if (!row.contains("}")) {
@@ -433,6 +501,13 @@ public class Analizer {
                                     pila.push(structure);
                                 }
                             }
+
+                            if (pila.peek().equals("do")) {
+                                if (row.contains("while")) {
+                                    structure = "while";
+                                    pila.push(structure);
+                                }
+                            }
                         } else {
                             var error = new StringBuilder();
                             error.append("Error: '{' en la línea -> ");
@@ -476,9 +551,10 @@ public class Analizer {
                 if (pila.peek().equals(structure)) {
                     pila.pop();
                     ctrlStructures--;
-                    if (structure.equals("else")) structure = "if";
                     System.out.println("Pop: "+structure);
-                    structure = "";
+                    if (structure.equals("else")) structure = "if";
+                    else if (structure.equals("while") && pila.contains("do")) structure = "do";
+                    else structure = "";
                 } else if (pila.peek().equals("(")) {
                     errores.add("Error: '" + pila.peek() + "' en estructura -> " + structure);
                 }
@@ -907,5 +983,8 @@ public class Analizer {
     public int getLineasCodigo() {
         return codigoEnLineas.size();
     }
-    
+
+    public ArrayList<String[]> getVariables() {
+        return variables;
+    }
 }
