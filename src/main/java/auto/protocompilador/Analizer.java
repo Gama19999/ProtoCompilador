@@ -16,14 +16,14 @@ import java.util.regex.Pattern;
  * <br> Analisis Semantico
  */
 public class Analizer {
-    private final Token numero;
-    private final Token palabraReservada;
-    private final Token operador;
-    private final Token delimitador;
-    private final Token agrupador;
-    private final Token simbolo;
-    private final Token identificador;
-    private final Token blanksOrUnknown;
+    private Token numero;
+    private Token palabraReservada;
+    private Token operador;
+    private Token delimitador;
+    private Token agrupador;
+    private Token simbolo;
+    private Token identificador;
+    private Token blanksOrUnknown;
     private final ArrayList<String> reservedWords;
 
     private final ArrayList<String[]> variables;
@@ -79,6 +79,16 @@ public class Analizer {
         codigo = null;
         lineasSinComentarios.clear();
         codigoEnLineas.clear();
+        lineaSC_codigoEnL.clear();
+        variables.clear();
+        numero = new Token("NUMERO");
+        palabraReservada = new Token("PALABRA RESERVADA");
+        operador = new Token("OPERADOR");
+        delimitador = new Token("DELIMITADOR");
+        agrupador = new Token("AGRUPADOR");
+        simbolo = new Token("SIMBOLO");
+        identificador = new Token("IDENTIFICADOR");
+        blanksOrUnknown = new Token("BLANKS OR UNKNOWN");
 
         StringBuilder texto = new StringBuilder();
         ObservableList<ObservableList<String>> lineasCodigo = FXCollections.observableArrayList(); // OBSArrL
@@ -256,7 +266,7 @@ public class Analizer {
      */
     private void seekVariables(int linea, String id) {
         var type = Character.isUpperCase(id.charAt(0)) ? "Object" : "Variable";
-        boolean[] varAlreadyChecked = {false};
+        // boolean[] varAlreadyChecked = {false};
 
         variables.forEach(i -> {
             if (i[0].equals(id) && i[5].equals("false")) {
@@ -266,39 +276,43 @@ public class Analizer {
                     }
                 });
                 i[5] = "true";
-                varAlreadyChecked[0] = true;
+                // varAlreadyChecked[0] = true;
             }
         });
 
-        if (!varAlreadyChecked[0]) {
-            switch (type) {
-                case "Object" -> {
-                    variables.add(new String[]{"", id, "", "", "CORRECTA", "false"});
-                }
-                case "Variable" -> {
-                    if (lineasSinComentarios.get(linea).contains("int")) {
-                        variables.add(new String[]{id, "int", "", "", "CORRECTA", "false"});
-                    } else if (lineasSinComentarios.get(linea).contains("float")) {
-                        variables.add(new String[]{id, "float", "", "", "CORRECTA", "false"});
-                    } else if (lineasSinComentarios.get(linea).contains("double")) {
-                        variables.add(new String[]{id, "double", "", "", "CORRECTA", "false"});
-                    } else if (lineasSinComentarios.get(linea).contains("byte")) {
-                        variables.add(new String[]{id, "byte", "", "", "CORRECTA", "false"});
-                    } else if (lineasSinComentarios.get(linea).contains("long")) {
-                        variables.add(new String[]{id, "long", "", "", "CORRECTA", "false"});
-                    } else if (lineasSinComentarios.get(linea).contains("short")) {
-                        variables.add(new String[]{id, "short", "", "", "CORRECTA", "false"});
-                    } else if (lineasSinComentarios.get(linea).contains("char")) {
-                        variables.add(new String[]{id, "char", "", "", "CORRECTA", "false"});
-                    } else if (lineasSinComentarios.get(linea).contains("boolean")) {
-                        variables.add(new String[]{id, "boolean", "", "", "CORRECTA", "false"});
-                    } else {
-                        variables.forEach(i -> {
-                            if (lineasSinComentarios.get(linea).contains(i[1]) && i[0].equals("")) {
-                                i[0] = id;
-                            }
-                        });
-                    }
+        for (var x : variables) {
+            if (x[0].equals(id)) {
+                if (!x[2].equals("")) return;
+            }
+        }
+
+        switch (type) {
+            case "Object" -> {
+                variables.add(new String[]{"", id, "", "", "CORRECTA", "false"});
+            }
+            case "Variable" -> {
+                if (lineasSinComentarios.get(linea).contains("int")) {
+                    variables.add(new String[]{id, "int", "", "", "CORRECTA", "false"});
+                } else if (lineasSinComentarios.get(linea).contains("float")) {
+                    variables.add(new String[]{id, "float", "", "", "CORRECTA", "false"});
+                } else if (lineasSinComentarios.get(linea).contains("double")) {
+                    variables.add(new String[]{id, "double", "", "", "CORRECTA", "false"});
+                } else if (lineasSinComentarios.get(linea).contains("byte")) {
+                    variables.add(new String[]{id, "byte", "", "", "CORRECTA", "false"});
+                } else if (lineasSinComentarios.get(linea).contains("long")) {
+                    variables.add(new String[]{id, "long", "", "", "CORRECTA", "false"});
+                } else if (lineasSinComentarios.get(linea).contains("short")) {
+                    variables.add(new String[]{id, "short", "", "", "CORRECTA", "false"});
+                } else if (lineasSinComentarios.get(linea).contains("char")) {
+                    variables.add(new String[]{id, "char", "", "", "CORRECTA", "false"});
+                } else if (lineasSinComentarios.get(linea).contains("boolean")) {
+                    variables.add(new String[]{id, "boolean", "", "", "CORRECTA", "false"});
+                } else {
+                    variables.forEach(i -> {
+                        if (lineasSinComentarios.get(linea).contains(i[1]) && i[0].equals("")) {
+                            i[0] = id;
+                        }
+                    });
                 }
             }
         }
