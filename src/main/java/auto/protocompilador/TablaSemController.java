@@ -28,6 +28,7 @@ public class TablaSemController {
     private void tablaOnPressed() {
         Token t3 = App.analizer.getIdentificador();
         ArrayList<String[]> vars = App.analizer.getVariables();
+        ArrayList<String[]> singleVars = new ArrayList<>();
         HashMap<String, Integer> hm = t3.getLexemas();
 
         for (var lexema : hm.keySet()) {
@@ -38,7 +39,13 @@ public class TablaSemController {
             });
         }
 
-        for (var v : vars) {
+        vars.forEach(v -> {
+            if (!v[0].equals("") || !v[2].equals("")) {
+                if (!v[1].equals("System")) singleVars.add(v);
+            }
+        });
+
+        for (var v : singleVars) {
             data.add(FXCollections.observableArrayList()); // Agrega una tupla
 
             int index = data.size() - 1;

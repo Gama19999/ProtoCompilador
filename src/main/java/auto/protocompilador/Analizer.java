@@ -181,7 +181,7 @@ public class Analizer {
     }
     
     /**
-     * Analiza el codigo fuente y lo esquematiza por tokens<p>ANÁLISIS SINTÁCTICO</p>
+     * Analiza el codigo fuente y lo esquematiza por tokens<p>ANÁLISIS LEXICO</p>
      */
     public void tokenLexe() {
         System.out.println(lineasSinComentarios.size()); // Numero de lienas de codigo
@@ -266,7 +266,6 @@ public class Analizer {
      */
     private void seekVariables(int linea, String id) {
         var type = Character.isUpperCase(id.charAt(0)) ? "Object" : "Variable";
-        // boolean[] varAlreadyChecked = {false};
 
         variables.forEach(i -> {
             if (i[0].equals(id) && i[5].equals("false")) {
@@ -276,9 +275,14 @@ public class Analizer {
                     }
                 });
                 i[5] = "true";
-                // varAlreadyChecked[0] = true;
             }
         });
+
+        var posF = lineasSinComentarios.get(linea).indexOf(id) + id.length();
+        var posI = lineasSinComentarios.get(linea).indexOf(id) - 1;
+        if (lineasSinComentarios.get(linea).charAt(posF) == '(') return;
+        if (lineasSinComentarios.get(linea).charAt(posF) == '.') return;
+        if (lineasSinComentarios.get(linea).charAt(posI) == '.') return;
 
         for (var x : variables) {
             if (x[0].equals(id)) {
@@ -291,7 +295,7 @@ public class Analizer {
                 variables.add(new String[]{"", id, "", "", "CORRECTA", "false"});
             }
             case "Variable" -> {
-                if (lineasSinComentarios.get(linea).contains("int")) {
+                if (lineasSinComentarios.get(linea).contains("int") && !lineasSinComentarios.get(linea).contains("pr")) {
                     variables.add(new String[]{id, "int", "", "", "CORRECTA", "false"});
                 } else if (lineasSinComentarios.get(linea).contains("float")) {
                     variables.add(new String[]{id, "float", "", "", "CORRECTA", "false"});
@@ -337,7 +341,7 @@ public class Analizer {
             }
         }
 
-        for (var fila = nfila; fila < lineasSinComentarios.size()-2; fila++) {
+        for (var fila = nfila; fila < lineasSinComentarios.size(); fila++) {
             var row = lineasSinComentarios.get(fila);
             System.out.println(ctrlStructures);
             System.out.println(fila);
@@ -433,11 +437,11 @@ public class Analizer {
                         errores.add(error.toString());
                     }
                 // }
-            } else if (row.contains("do")) {
-                /*if (!pila.isEmpty()) {
+            }/* else if (row.contains("do")) {
+                if (!pila.isEmpty()) {
                     var resAnidado = ctrlStructsAnalizer(fila);
                     errores.addAll(resAnidado);
-                } else {*/
+                } else {
                     structure = "do";
                     pila.push(structure);
                     if (!row.contains("{")) {
@@ -450,8 +454,8 @@ public class Analizer {
                         });
                         errores.add(error.toString());
                     }
-                // }
-            } else if (row.contains("else")) {
+                }
+            }*/ else if (row.contains("else")) {
                 if (!pila.isEmpty()) {
                     if (structure.equals("if")) {
                         if (!row.contains("}")) {
